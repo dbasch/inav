@@ -52,7 +52,7 @@
 #include "sensors/compass.h"
 #include "sensors/gyro.h"
 #include "sensors/sensors.h"
-
+#include "navigation/navigation.h"
 
 /**
  * In Cleanflight accelerometer is aligned in the following way:
@@ -483,7 +483,7 @@ static void imuCalculateEstimatedAttitude(float dT)
             canUseCOG = gpsSol.groundSpeed >= 300;
             groundCourse = gpsSol.groundCourse;
         } else {
-            if (gpsSol.groundSpeed >= 600) {
+            if (gpsSol.groundSpeed >= 600 && GPS_distanceToHome > 100) {
                 float tiltDirection = atan2_approx(attitude.values.roll, attitude.values.pitch);
                 float accXYMagnitudeSq = sq(imuMeasuredAccelBF.V.Y) + sq(imuMeasuredAccelBF.V.X);
 

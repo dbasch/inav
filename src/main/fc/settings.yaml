@@ -1201,6 +1201,10 @@ groups:
         field: mc.max_bank_angle
         min: 15
         max: 45
+      - name: nav_mc_home_bank_angle
+        field: mc.max_home_bank_angle
+        min: 10
+        max: 30
       - name: nav_mc_hover_thr
         field: mc.hover_throttle
         min: 1000

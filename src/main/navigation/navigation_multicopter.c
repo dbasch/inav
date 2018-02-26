@@ -322,8 +322,13 @@ static void updatePositionVelocityController_MC(void)
     float newVelY = posErrorY * posControl.pids.pos[Y].param.kP;
 
     // Get max speed from generic NAV (waypoint specific), don't allow to move slower than 0.5 m/s
-    const float maxSpeed = getActiveWaypointSpeed();
-
+    const float maxSpeedNominal = getActiveWaypointSpeed();
+    float maxSpeed = maxSpeedNominal;
+    // hack to slow down as we approach home
+    if (GPS_distanceToHome < 100 && GPS_distanceToHome > 20) {
+	maxSpeed = maxSpeedNominal * GPS_distanceToHome / 100;
+    }
+    
     // Scale velocity to respect max_speed
     float newVelTotal = sqrtf(sq(newVelX) + sq(newVelY));
     if (newVelTotal > maxSpeed) {
@@ -395,7 +400,9 @@ static void updatePositionAccelController_MC(timeDelta_t deltaMicros, float maxA
     const float desiredPitch = atan2_approx(accelForward, GRAVITY_CMSS);
     const float desiredRoll = atan2_approx(accelRight * cos_approx(desiredPitch), GRAVITY_CMSS);
 
-    const int16_t maxBankAngle = DEGREES_TO_DECIDEGREES(navConfig()->mc.max_bank_angle);
+    const int16_t maxBankAngle = (GPS_distanceToHome > 20) ?
+	DEGREES_TO_DECIDEGREES(navConfig()->mc.max_bank_angle)
+	: navConfig()->mc.max_home_bank_angle;
     posControl.rcAdjustment[ROLL] = constrain(RADIANS_TO_DECIDEGREES(desiredRoll), -maxBankAngle, maxBankAngle);
     posControl.rcAdjustment[PITCH] = constrain(RADIANS_TO_DECIDEGREES(desiredPitch), -maxBankAngle, maxBankAngle);
 }
