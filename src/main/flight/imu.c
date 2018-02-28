@@ -474,7 +474,6 @@ static void imuCalculateEstimatedAttitude(float dT)
 #if defined(USE_GPS)
     bool canUseCOG = false;
     int16_t groundCourse;
-    static int16_t lastCOGRotation = 0;
 
     if (imuHasGPSHeadingEnabled() && gpsHasCOG) {
         if (STATE(FIXED_WING)) {
@@ -493,12 +492,10 @@ static void imuCalculateEstimatedAttitude(float dT)
                 if (accXYMagnitudeSq < sq(imuConfig()->gps_heading_max_accel_cm)) {
                     // Accelerometer reading is low, and ground speed is high, therefore we can safely assume
                     // that the craft is flying in the direction it is tilted, therefore the COGRotation
-                    // correction should be valid, so lets set a new lastCOGRotation
-                    lastCOGRotation = RADIANS_TO_DECIDEGREES(tiltDirection);
+                    // correction should be valid.
+                    groundCourse = (gpsSol.groundCourse + RADIANS_TO_DECIDEGREES(tiltDirection));
+                    canUseCOG = true;
                 }
-
-                groundCourse = (gpsSol.groundCourse + lastCOGRotation);
-                canUseCOG = true;
             }
         }
         // Only use each COG reading once, to avoid reusing the same GPS
