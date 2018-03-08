@@ -486,7 +486,6 @@ static void imuCalculateEstimatedAttitude(float dT)
             if (gpsSol.groundSpeed >= 600 && GPS_distanceToHome > 100) {
                 float tiltDirection = atan2_approx(attitude.values.roll, attitude.values.pitch);
                 float accXYMagnitudeSq = sq(imuMeasuredAccelBF.V.Y) + sq(imuMeasuredAccelBF.V.X);
-		DEBUG_SET(DEBUG_RTH, 0, (int) accXYMagnitudeSq);
                 // Check that the either the acceleration in the XY plane is small ( < 150cm/s^2)
                 // This lets us reject measurements where e.g. the MR is braking and it's tilted
                 // back while moving forward
